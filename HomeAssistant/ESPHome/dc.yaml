@@ -1,0 +1,69 @@
+esphome:
+  name: dc-pwm-01
+
+esp32:
+  board: esp32dev
+  framework:
+    type: arduino
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+  password: "123456"
+
+ota:
+  password: "123456"
+
+wifi:
+  ssid: "SSID"
+  password: "PASSWORD"
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "Dc-Pwm-01 Fallback Hotspot"
+    password: "123456"
+
+captive_portal:
+    
+i2c:
+  sda: 21
+  scl: 22
+  scan: true
+  id: bus_a
+
+pcf8574:
+  - id: 'pcf8574_hub'
+    address: 0x20
+    pcf8575: false
+
+pca9685:
+  frequency: 1525.88
+
+output:
+  - platform: pca9685
+    channel: 0
+    id: pwm01
+
+binary_sensor:
+  - platform: gpio
+    name: "Motion A"
+    device_class: motion
+    pin:
+      number: 26
+      inverted: true
+  - platform: gpio
+    name: "Motion B"
+    device_class: motion
+    pin:
+      pcf8574: pcf8574_hub
+      number: 0
+      mode:
+        input: true
+      inverted: true
+
+light:
+  - platform: monochromatic
+    name: 'main light'
+    output: pwm01
